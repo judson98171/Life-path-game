@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ink Game Prototype</title>
+    <script src="https://cdn.jsdelivr.net/npm/inkjs@1.11.1/dist/ink.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f8f8f8; }
+        #storyContainer { background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: auto; }
+        .choice { margin: 10px 0; }
+        button { background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <div id="storyContainer"></div>
+    <script>
+        const storyContent = `
+VAR pressure = 50
+VAR fear = 50
+VAR growth = 50
+VAR regret = 50
+VAR loneliness = 50
+
+=== start ===
+It’s two months before graduation. Your room is messy, papers scattered everywhere, and your phone keeps buzzing with messages from friends talking about their futures.
+
+You sit at your desk, staring at your college application essay — the blank page reflecting your uncertainty.
+
+What do you want to focus on?
+
++ [Push forward with college applications]
+    -> college_apps
++ [Look for a job or internship]
+    -> job_search
++ [Avoid the pressure for now]
+    -> avoidance
+
+=== college_apps ===
+You decide to buckle down and work on your college applications.
+
+A call from your counselor comes in.
+
+Counselor: "Remember, this is your chance. You can do this, but you need to put in the work."
+
+-> pressure += 10
+-> fear += 5
+-> growth += 5
+
+You feel the pressure rising but also a flicker of hope.
+
+~ goto reflection
+
+=== job_search ===
+You decide to look for a job or internship instead.
+
+A friend texts you about an opening nearby.
+
+Friend: "Hey, there’s this job opening you might like! Thought you should know."
+
+-> growth += 10
+-> pressure += 5
+-> fear += 5
+
+You feel excited but nervous about stepping into the unknown.
+
+~ goto reflection
+
+=== avoidance ===
+You decide to put off thinking about all this for now.
+
+Scrolling through social media, you see friends making plans.
+
+A pang of loneliness and regret washes over you.
+
+-> regret += 10
+-> fear += 10
+-> growth -= 5
+-> loneliness += 10
+
+You wonder if you’re falling behind.
+
+~ goto reflection
+
+=== reflection ===
+You take a moment to think about your choices.
+
+What’s on your mind?
+
++ [“Am I making the right choice for my future?”]
++ [“It’s scary, but I have to keep pushing.”]
++ [“Maybe there’s a path no one’s told me about.”]
++ [“Why do I feel so alone right now?”]
+
+-> END
+`;
+
+        function loadStory() {
+            let story = new inkjs.Story(storyContent);
+            let storyContainer = document.getElementById("storyContainer");
+
+            function continueStory() {
+                while (story.canContinue) {
+                    let paragraph = document.createElement("p");
+                    paragraph.textContent = story.Continue();
+                    storyContainer.appendChild(paragraph);
+                }
+                story.currentChoices.forEach((choice, index) => {
+                    let choiceButton = document.createElement("button");
+                    choiceButton.classList.add("choice");
+                    choiceButton.textContent = choice.text;
+                    choiceButton.addEventListener("click", () => {
+                        story.ChooseChoiceIndex(index);
+                        storyContainer.innerHTML = '';
+                        continueStory();
+                    });
+                    storyContainer.appendChild(choiceButton);
+                });
+            }
+
+            continueStory();
+        }
+
+        loadStory();
+    </script>
+</body>
+</html>
